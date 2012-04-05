@@ -276,6 +276,10 @@
 		"context": [{"key": "setting.command_mode"}]
 	},
 
+	{ "keys": ["'", "."], "command": "vi_goto_last_edit",
+		"context": [{"key": "setting.command_mode"}]
+	},
+
 	{ "keys": ["~"], "command": "set_action_motion", "args": {
 		"action": "swap_case",
 		"motion": "vi_move_by_characters_in_line",

@@ -1107,7 +1107,7 @@ class ViGotoLastEdit(sublime_plugin.TextCommand):
     def move_cursor_to_region_set(self, region_set):
         """ Clear the cursor's position and move it to `region_set`. """
         sel = self.view.sel()
-        self.original_position = [r for r in sel]
+        self.original_position = list(sel)
         sel.clear()
         for region in region_set:
             sel.add(region)
@@ -1124,7 +1124,7 @@ class ViGotoLastEdit(sublime_plugin.TextCommand):
         its original position.
         """
         last_edit = self.view.get_regions(LAST_EDIT_KEY)
-        current_position = [r for r in self.view.sel()]
+        current_position = list(self.view.sel())
 
         if not last_edit:
             return

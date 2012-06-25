@@ -1016,13 +1016,26 @@ class ViUnindent(sublime_plugin.TextCommand):
         transform_selection_regions(self.view, shrink_to_first_char)
 
 class ViSetBookmark(sublime_plugin.TextCommand):
+    @classmethod
+    def _run(kls, view, character, regions=None):
+        """
+        This exposes bookmark-setting on a native-level, so that
+        commands can pass a view.sel() directly without having to
+        convert it into a list/dict/etc. deeply.
+        """
+        if regions is None:
+            regions = list(view.sel())
+        view.add_regions("bookmark_" + character, regions,
+            "", "", sublime.PERSISTENT | sublime.HIDDEN)
+
     def run(self, edit, character):
         sublime.status_message("Set bookmark " + character)
-        self.view.add_regions("bookmark_" + character, [s for s in self.view.sel()],
-            "", "", sublime.PERSISTENT | sublime.HIDDEN)
+        self._run(self.view, character)
 
 class ViSelectBookmark(sublime_plugin.TextCommand):
     def run(self, edit, character, select_bol=False):
+        frozen_regions = list(self.view.sel())
+
         self.view.run_command('select_all_bookmarks', {'name': "bookmark_" + character})
         if select_bol:
             sels = list(self.view.sel())
@@ -1030,6 +1043,9 @@ class ViSelectBookmark(sublime_plugin.TextCommand):
             for r in sels:
                 start = self.view.line(r.a).begin()
                 self.view.sel().add(sublime.Region(start, start))
+
+        ViSetBookmark._run(self.view, "`", frozen_regions)
+        ViSetBookmark._run(self.view, "'", frozen_regions)
 
 g_macro_target = None
 

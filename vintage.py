@@ -1134,51 +1134,7 @@ class MoveGroupFocus(sublime_plugin.WindowCommand):
         except StopIteration:
             return
 
-
-LAST_EDIT_KEY = 'vintage_last_edit'
-
-
 class ViRecordLastEdit(sublime_plugin.EventListener):
     def on_modified(self, view):
         """ Record the cursor's position at the last edit in the view. """
-        view.add_regions(LAST_EDIT_KEY, [s for s in view.sel()], '')
-
-
-class ViGotoLastEdit(sublime_plugin.TextCommand):
-    # The position the cursor was at before the command fired. Saved when the
-    # command is run, so that if the user runs the command again before making
-    # another edit in the file, the cursor returns to its original position.
-    original_position = None
-
-    def move_cursor_to_region_set(self, region_set):
-        """ Clear the cursor's position and move it to `region_set`. """
-        sel = self.view.sel()
-        self.original_position = list(sel)
-        sel.clear()
-        for region in region_set:
-            sel.add(region)
-        self.view.show(region_set[0])
-
-    def run(self, edit):
-        """
-        If there was a last edit recorded for the view, save the current
-        position as `self.original_position` and move the cursor to the position
-        of the last edit.
-
-        If the cursor is currently at the same position as the last edit, and
-        there `self.original_position` is available, then return the cursor to
-        its original position.
-        """
-        last_edit = self.view.get_regions(LAST_EDIT_KEY)
-        current_position = list(self.view.sel())
-
-        if not last_edit:
-            return
-
-        if self.original_position is not None \
-                and current_position == last_edit:
-            self.move_cursor_to_region_set(self.original_position)
-            return
-
-        self.move_cursor_to_region_set(last_edit)
-
+        ViSetBookmark._run(view, ".")

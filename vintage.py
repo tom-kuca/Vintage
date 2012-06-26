@@ -1016,16 +1016,32 @@ class ViUnindent(sublime_plugin.TextCommand):
         transform_selection_regions(self.view, shrink_to_first_char)
 
 class ViSetBookmark(sublime_plugin.TextCommand):
+    @classmethod
+    def _run(kls, view, character, regions=None):
+        """
+        This exposes bookmark-setting on a native-level, so that
+        commands can pass a view.sel() directly without having to
+        convert it into a list/dict/etc. deeply.
+        """
+        if regions is None:
+            regions = list(view.sel())
+        view.add_regions("bookmark_" + character, regions,
+            "", "", sublime.PERSISTENT | sublime.HIDDEN)
+
     def run(self, edit, character):
         sublime.status_message("Set bookmark " + character)
-        self.view.add_regions("bookmark_" + character, [s for s in self.view.sel()],
-            "", "", sublime.PERSISTENT | sublime.HIDDEN)
+        self._run(self.view, character)
 
 class ViSelectBookmark(sublime_plugin.TextCommand):
     def run(self, edit, character, select_bol=False):
+        frozen_regions = list(self.view.sel())
+
         self.view.run_command('select_all_bookmarks', {'name': "bookmark_" + character})
         if select_bol:
             self.view.run_command('vi_move_to_first_non_white_space_character')
+
+        ViSetBookmark._run(self.view, "`", frozen_regions)
+        ViSetBookmark._run(self.view, "'", frozen_regions)
 
 g_macro_target = None
 
@@ -1113,3 +1129,8 @@ class MoveGroupFocus(sublime_plugin.WindowCommand):
             self.window.focus_group(matches.next())
         except StopIteration:
             return
+
+class ViRecordLastEdit(sublime_plugin.EventListener):
+    def on_modified(self, view):
+        """ Record the cursor's position at the last edit in the view. """
+        ViSetBookmark._run(view, ".")

@@ -350,6 +350,10 @@ class ViExpandToTag(sublime_plugin.TextCommand):
             self.view.run_command('expand_selection', {'to': 'tag'})
 
 class ViExpandToBrackets(sublime_plugin.TextCommand):
+
+
+
+
     def run(self, edit, character, outer = False):
         self.view.run_command('expand_selection', {'to': 'brackets', 'brackets': character})
         if outer:
@@ -373,3 +377,9 @@ class ScrollCurrentLineToScreenCenter(sublime_plugin.TextCommand):
          point = advance_while_white_space_character(self.view, point)
          transform_selection(self.view, lambda pt: point, extend)
          self.view.run_command('show_at_center')
+
+
+class ViInsertAtLastEdit(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.run_command('vi_select_bookmark', {'character': '.'})
+        self.view.run_command('enter_insert_mode')

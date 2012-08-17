@@ -421,6 +421,11 @@
 		"context": [{"key": "setting.command_mode"}]
 	},
 
+	{
+		"keys": ["g", "i"], "command": "vi_insert_at_last_edit",
+		"context": [{"key": "setting.command_mode"}]
+	},
+
 	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_indent", "description": "Indent"},
 		"context": [{"key": "setting.command_mode"}]
 	},

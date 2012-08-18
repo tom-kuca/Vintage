@@ -46,3 +46,13 @@ class ViSaveAndExit(sublime_plugin.WindowCommand):
         self.window.run_command('close')
         if len(self.window.views()) == 0:
             self.window.run_command('close')
+            
+# Close view without prompt
+class ViExit(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # Delete all content to avoid prompt to save file
+        self.view.run_command('select_all')
+        self.view.run_command('left_delete')
+        self.view.window().run_command('close')
+        if len(self.view.window().views()) == 0:
+            self.view.window().run_command('close')

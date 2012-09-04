@@ -34,8 +34,9 @@ class ViOpenFileUnderSelectionCommand(sublime_plugin.TextCommand):
                                             lambda x: x > current_line.end(),
                                             increment=1)
             file_name = self.view.substr(sublime.Region(left + 1, right))
-
-        file_name = os.path.join(os.path.dirname(self.view.file_name()),
+            
+        if self.view.file_name():
+            file_name = os.path.join(os.path.dirname(self.view.file_name()),
                                     file_name)
         if os.path.exists(file_name):
             self.view.window().open_file(file_name)
